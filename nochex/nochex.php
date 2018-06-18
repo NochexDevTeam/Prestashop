@@ -19,10 +19,11 @@ class nochex extends PaymentModule
 		$this->name = 'nochex';
 		$this->tab = 'payments_gateways';
 		$this->author = 'Nochex';
-		$this->version = 2.0;
+		$this->version = 2.1;
 
 		$this->currencies = true;
-		$this->currencies_mode = 'checkbox';		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6.99.99');
+		$this->currencies_mode = 'checkbox';		
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6.99.99');
 		
 		/*--- This array gets all of the configuration information from the Configuration file/table in the database. ---*/
 		$config = Configuration::getMultiple(array('NOCHEX_APC_EMAIL','NOCHEX_APC_TESTMODE','NOCHEX_APC_HIDEDETAILS','NOCHEX_APC_DEBUG','NOCHEX_APC_XMLCOLLECTION','NOCHEX_APC_POSTAGE'));
