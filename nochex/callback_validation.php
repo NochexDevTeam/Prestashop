@@ -119,7 +119,7 @@ if ($response=="AUTHORISED") 	{
 
 $nochex = new nochex();    
 $currency = new Currency($cookie->id_currency);
-$nochex->validateOrder($_POST["order_id"], _PS_OS_PAYMENT_, $_POST["amount"], $nochex->displayName, NULL, NULL, $currency->id);	
+	
 $extras = array("transaction_id" => $transaction_id);	$customer->secure_key = $_POST["custom"];	
 
 $nochex->validateOrder($_POST["order_id"], Configuration::get('PS_OS_PAYMENT'), $_POST["amount"], $nochex->displayName,$responses,$extras, $_REQUEST["cIY"],false, $customer->secure_key);		
@@ -133,10 +133,10 @@ $nochexDebug->writeDebug($responseAuthorisedMessage);
 $nochex = new nochex();
 
 $currency = new Currency($cookie->id_currency);
-$nochex->validateOrder($_POST["order_id"], _PS_OS_ERROR_, $_POST["amount"], $nochex->displayName, NULL, NULL, $currency->id);
 
 $extras = array("transaction_id" => $transaction_id);
-$custSecure = $_POST["custom"];$nochex->validateOrder($_POST["order_id"], Configuration::get('PS_OS_ERROR'), $_POST["amount"], $nochex->displayName,$responses,$extras, $_REQUEST["cIY"], $custSecure);
+$custSecure = $_POST["custom"];
+$nochex->validateOrder($_POST["order_id"], Configuration::get('PS_OS_ERROR'), $_POST["amount"], $nochex->displayName,$responses,$extras, $_REQUEST["cIY"], $custSecure);
 $responseUnAuthorisedMessage= "APC Response.... Order ID: " . $_POST["order_id"] . "... PS_OS_Payment: ". _PS_OS_PAYMENT_ . "... Amount: ". $_POST["amount"]. "... Display name: ". $nochex->displayName. "... CurrencyID: ". $currency->id;$nochexDebug->writeDebug($responseUnAuthorisedMessage);
 
 }}
