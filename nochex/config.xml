@@ -2,7 +2,7 @@
 <module>
 	<name>nochex</name>
 	<displayName><![CDATA[Nochex APC Module]]></displayName>
-	<version><![CDATA[2]]></version>
+	<version><![CDATA[2.1]]></version>
 	<description><![CDATA[Accept payments by Nochex]]></description>
 	<author><![CDATA[Nochex]]></author>
 	<tab><![CDATA[payments_gateways]]></tab>
