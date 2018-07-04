@@ -17,6 +17,9 @@ Changelog
   
   Update - Bug fix for APC as orders were being duplicated.
   
+  - Extra comments on features
+  - Callback feature been added to Nochex Module / Backend
+  
 = 2 =
 
   Update to include new module features
