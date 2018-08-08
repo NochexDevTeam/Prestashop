@@ -40,7 +40,7 @@ class nochex extends PaymentModule
 		if (isset($config['NOCHEX_APC_POSTAGE']))
 			$this->nochex_postage = $config['NOCHEX_APC_POSTAGE'];		
 		if (isset($config['NOCHEX_APC_CALLBACK']))
-			$this->nochex_postage = $config['NOCHEX_APC_CALLBACK'];		
+			$this->nochex_callback = $config['NOCHEX_APC_CALLBACK'];		
 		parent::__construct(); /* The parent construct is required for translations */
 
 		$this->page = basename(__FILE__, '.php');
@@ -97,7 +97,7 @@ class nochex extends PaymentModule
 			Configuration::updateValue('NOCHEX_APC_POSTAGE', $_POST['nochex_postage']); /* value is checked or null, stores the state of the checkbox */			
 			Configuration::updateValue('NOCHEX_APC_CALLBACK', $_POST['nochex_callback']); /* value is checked or null, stores the state of the checkbox */			
 			// Refreshes the page to show updated controls.
-			header('Location: ' . $_SERVER['PHP_SELF'] . '?controller=AdminModules&token='.Tools::getValue('token').$identifier.'&configure=nochex&tab_module='.$this->l('Payments & Gateways').'&module_name=nochex');
+			/*header('Location: ' . $_SERVER['PHP_SELF'] . '?controller=AdminModules&token='.Tools::getValue('token').$identifier.'&configure=nochex&tab_module='.$this->l('Payments & Gateways').'&module_name=nochex');*/
 		}
 		$this->_html .= '<div class="conf confirm"><img src="../img/admin/ok.gif" alt="'.$this->l('ok').'" /> '.$this->l('Settings updated').'</div>';
 	}
@@ -185,27 +185,28 @@ class nochex extends PaymentModule
 	}/*---  Function shows the display form for the admin/config form. ---*/
 	private function _displayForm()
 	{
-	/*--- Calls the function to return the value of the checkbox ---*/
-	$validateTestCheck = $this->_validateTestCheckbox();
-	$validateBillCheck = $this->_validateBillCheckbox();
-	$validateDebugCheck = $this->_validateDebugCheckbox();
-	$validateXmlcollectionCheck = $this->_validateXmlcollectionCheckbox();
-	$validatePostageCheck = $this->_validatePostageCheckbox();		$validateCallbackCheck = $this->_validateCallbackCheckbox();
-	
-	/*--- Form parts that are added in the Configuration file of the nochex module. ---*/
+			/*--- Calls the function to return the value of the checkbox ---*/
+		$validateTestCheck = $this->_validateTestCheckbox();
+		$validateBillCheck = $this->_validateBillCheckbox();
+		$validateDebugCheck = $this->_validateDebugCheckbox();
+		$validateXmlcollectionCheck = $this->_validateXmlcollectionCheckbox();
+		$validatePostageCheck = $this->_validatePostageCheckbox();		
+		$validateCallbackCheck = $this->_validateCallbackCheckbox();
+		
+		/*--- Form parts that are added in the Configuration file of the nochex module. ---*/
 		$this->_html .=
-		'<form action="'.$_SERVER['REQUEST_URI'].'" method="post">
+		'<form action="'.(Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://').htmlspecialchars($_SERVER['HTTP_HOST'], ENT_COMPAT, 'UTF-8').$_SERVER['REQUEST_URI'].'" method="post">
 			<fieldset>
 			<legend><img src="../img/admin/contact.gif" />'.$this->l('Account details').'</legend>
 				<table border="0" width="1250" cellpadding="0" cellspacing="0" id="form">
 					<tr><td colspan="2">'.$this->l('Please specify your Nochex account details').'.<br /><br /></td></tr>
 					<tr><td width="300" style="height: 35px;">'.$this->l('Nochex Merchant ID / Email Address').'</td><td><input type="text" name="email" value="'.htmlentities(Tools::getValue('email', $this->email), ENT_COMPAT, 'UTF-8').'" style="width: 250px;" /></td><td width="950"><p style="font-style:italic; text-size:7px; padding-left:10px;"> Nochex Merchant ID / Email Address, This is your Nochex Merchant ID, e.g. test@test.com or one that has been created: e.g. test</p></td></tr>
-					<tr><td width="300" style="height: 35px;">'.$this->l('Test Mode').'</td><td><input type="checkbox" name="test_mode" value="checked" '. $validateTestCheck .' /></td><td width="950"><p style="font-style:italic; text-size:7px; padding-left:10px;"> Test Mode, If the Test mode option has been selected, the system will be in test mode. Note (leave unchecked for Live transactions.) </p></td></tr>
-					<tr><td width="300" style="height: 35px;">'.$this->l('Hide Billing Details').'</td><td><input type="checkbox" name="hide_details" value="checked" '. $validateBillCheck .' /></td><td width="950"><p style="font-style:italic; text-size:7px; padding-left:10px;"> Hide Billing Details, If the Hide Billing Details option has been checked then billing details will be hidden, Leave unchecked if you want customers to see billing details.</p></td></tr>
-					<tr><td width="300" style="height: 35px;">'.$this->l('Debug').'</td><td><input type="checkbox" name="nochex_debug" value="checked" '. $validateDebugCheck .' /></td><td width="950"><p style="font-style:italic; text-size:7px; padding-left:10px;"> Debug, If the Debug option has been selected, details of the module will be saved to a file. nochex_debug.txt which can be found in the nochex module which can be found somewhere like: www.test.com/prestashop/modules/nochex/nochex_debug.txt, leave unchecked if you dont want to record data about the system.</p></td></tr>
-					<tr><td width="300" style="height: 35px;">'.$this->l('Detailed Product Information').'</td><td><input type="checkbox" name="nochex_xmlcollection" value="checked" '. $validateXmlcollectionCheck .' /></td><td width="950"><p style="font-style:italic; text-size:7px; padding-left:10px;">Enable this option to display ordered products in a table-structured format on your payment page</p></td></tr>
-					<tr><td width="300" style="height: 35px;">'.$this->l('Postage').'</td><td><input type="checkbox" name="nochex_postage" value="checked" '. $validatePostageCheck .' /></td><td width="950"><p style="font-style:italic; text-size:7px; padding-left:10px;">Enable this option to view postage separately from the total amount on your Nochex payment page</p></td></tr>		
-					<tr><td width="300" style="height: 35px;">'.$this->l('Callback System').'</td><td><input type="checkbox" name="nochex_callback" value="checked" '. $validateCallbackCheck .' /></td><td width="950"><p style="font-style:italic; text-size:7px; padding-left:10px;">Enable this option to use our callback system<br/><span style="color:red">Note: you will need to contact your Support Manager or raise a support ticket to enable this on your Nochex Account.</span></p></td></tr>				
+					<tr><td width="300" style="height: 35px;">'.$this->l('Test Mode').'</td><td><input type="checkbox" name="test_mode" value="checked" '. htmlentities(Tools::getValue('test_mode', $validateTestCheck), ENT_COMPAT, 'UTF-8') .' /></td><td width="950"><p style="font-style:italic; text-size:7px; padding-left:10px;"> Test Mode, If the Test mode option has been selected, the system will be in test mode. Note (leave unchecked for Live transactions.) </p></td></tr>
+					<tr><td width="300" style="height: 35px;">'.$this->l('Hide Billing Details').'</td><td><input type="checkbox" name="hide_details" value="checked" '. htmlentities(Tools::getValue('hide_details', $validateBillCheck), ENT_COMPAT, 'UTF-8') .' /></td><td width="950"><p style="font-style:italic; text-size:7px; padding-left:10px;"> Hide Billing Details, If the Hide Billing Details option has been checked then billing details will be hidden, Leave unchecked if you want customers to see billing details.</p></td></tr>
+					<tr><td width="300" style="height: 35px;">'.$this->l('Debug').'</td><td><input type="checkbox" name="nochex_debug" value="checked" '. htmlentities(Tools::getValue('nochex_debug', $validateDebugCheck), ENT_COMPAT, 'UTF-8') .' /></td><td width="950"><p style="font-style:italic; text-size:7px; padding-left:10px;"> Debug, If the Debug option has been selected, details of the module will be saved to a file. nochex_debug.txt which can be found in the nochex module which can be found somewhere like: www.test.com/prestashop/modules/nochex/nochex_debug.txt, leave unchecked if you dont want to record data about the system.</p></td></tr>
+					<tr><td width="300" style="height: 35px;">'.$this->l('Detailed Product Information').'</td><td><input type="checkbox" name="nochex_xmlcollection" value="checked" '.  htmlentities(Tools::getValue('nochex_xmlcollection', $validateXmlcollectionCheck), ENT_COMPAT, 'UTF-8') .' /></td><td width="950"><p style="font-style:italic; text-size:7px; padding-left:10px;">Enable this option to display ordered products in a table-structured format on your payment page</p></td></tr>
+					<tr><td width="300" style="height: 35px;">'.$this->l('Postage').'</td><td><input type="checkbox" name="nochex_postage" value="checked" '. htmlentities(Tools::getValue('nochex_postage', $validatePostageCheck), ENT_COMPAT, 'UTF-8') .' /></td><td width="950"><p style="font-style:italic; text-size:7px; padding-left:10px;">Enable this option to view postage separately from the total amount on your Nochex payment page</p></td></tr>		
+					<tr><td width="300" style="height: 35px;">'.$this->l('Callback System').'</td><td><input type="checkbox" name="nochex_callback" value="checked" '. htmlentities(Tools::getValue('nochex_callback', $validateCallbackCheck), ENT_COMPAT, 'UTF-8')  .' /></td><td width="950"><p style="font-style:italic; text-size:7px; padding-left:10px;">Enable this option to use our callback system<br/><span style="color:red">Note: you will need to contact your Support Manager or raise a support ticket to enable this on your Nochex Account.</span></p></td></tr>				
 					<tr><td></td><td><input class="button" name="btnSubmit" value="'.$this->l('Update settings').'" type="submit" /></td></tr>
 				</table>
 			</fieldset>
