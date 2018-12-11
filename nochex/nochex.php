@@ -89,15 +89,21 @@ class nochex extends PaymentModule
 		
 		if (isset($_POST['btnSubmit']))
 		{
-			Configuration::updateValue('NOCHEX_APC_EMAIL', isset($_POST['email']));
-			Configuration::updateValue('NOCHEX_APC_TESTMODE', isset($_POST['test_mode'])); /* value is checked or null, stores the state of the checkbox */
-			Configuration::updateValue('NOCHEX_APC_HIDEDETAILS', isset($_POST['hide_details'])); /* value is checked or null, stores the state of the checkbox */
-			Configuration::updateValue('NOCHEX_APC_DEBUG', isset($_POST['nochex_debug'])); /* value is checked or null, stores the state of the checkbox */
-			Configuration::updateValue('NOCHEX_APC_XMLCOLLECTION', isset($_POST['nochex_xmlcollection'])); /* value is checked or null, stores the state of the checkbox */
-			Configuration::updateValue('NOCHEX_APC_POSTAGE', isset($_POST['nochex_postage'])); /* value is checked or null, stores the state of the checkbox */			
-			Configuration::updateValue('NOCHEX_APC_CALLBACK',isset($_POST['nochex_callback'])); /* value is checked or null, stores the state of the checkbox */			
+		
+			$nochex_merchantID = preg_replace('/[^A-Za-z0-9\-]@_$/', '',filter_var($_POST['email'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH));
+			
+			if($nochex_merchantID != ""){
+			Configuration::updateValue('NOCHEX_APC_EMAIL', $nochex_merchantID);
+			Configuration::updateValue('NOCHEX_APC_TESTMODE', $_POST['test_mode']); /* value is checked or null, stores the state of the checkbox */
+			Configuration::updateValue('NOCHEX_APC_HIDEDETAILS', $_POST['hide_details']); /* value is checked or null, stores the state of the checkbox */
+			Configuration::updateValue('NOCHEX_APC_DEBUG', $_POST['nochex_debug']); /* value is checked or null, stores the state of the checkbox */
+			Configuration::updateValue('NOCHEX_APC_XMLCOLLECTION', $_POST['nochex_xmlcollection']); /* value is checked or null, stores the state of the checkbox */
+			Configuration::updateValue('NOCHEX_APC_POSTAGE', $_POST['nochex_postage']); /* value is checked or null, stores the state of the checkbox */			
+			Configuration::updateValue('NOCHEX_APC_CALLBACK',$_POST['nochex_callback']); /* value is checked or null, stores the state of the checkbox */	
+			}
 			// Refreshes the page to show updated controls.
 			/*header('Location: ' . $_SERVER['PHP_SELF'] . '?controller=AdminModules&token='.Tools::getValue('token').$identifier.'&configure=nochex&tab_module='.$this->l('Payments & Gateways').'&module_name=nochex');*/
+			header('Location: ' . $_SERVER['HTTP_REFERER']);
 		}
 		$this->_html .= '<div class="conf confirm"><img src="../img/admin/ok.gif" alt="'.$this->l('ok').'" /> '.$this->l('Settings updated').'</div>';
 	}
