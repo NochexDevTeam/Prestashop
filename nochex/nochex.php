@@ -101,11 +101,11 @@ class nochex extends PaymentModule
 			Configuration::updateValue('NOCHEX_APC_POSTAGE', $_POST['nochex_postage']); /* value is checked or null, stores the state of the checkbox */			
 			Configuration::updateValue('NOCHEX_APC_CALLBACK',$_POST['nochex_callback']); /* value is checked or null, stores the state of the checkbox */	
 			}
-			// Refreshes the page to show updated controls.
-			/*header('Location: ' . $_SERVER['PHP_SELF'] . '?controller=AdminModules&token='.Tools::getValue('token').$identifier.'&configure=nochex&tab_module='.$this->l('Payments & Gateways').'&module_name=nochex');*/
-			header('Location: ' . $_SERVER['HTTP_REFERER']);
+			// Refreshes the page to show updated controls. 
+			header('Location: ' . $_SERVER['HTTP_REFERER'] . '&ud=1');
+		}else if(isset($_REQUEST['ud']) == 1){
+		$this->_html .= '<div class="conf confirm" style="float: right;padding: 5px;background: lightgoldenrodyellow;font-weight: bold;"><img src="../img/admin/ok.gif" alt="'.$this->l('ok').'" /> '.$this->l('Nochex Module updated').'</div>';
 		}
-		$this->_html .= '<div class="conf confirm"><img src="../img/admin/ok.gif" alt="'.$this->l('ok').'" /> '.$this->l('Settings updated').'</div>';
 	}
 	private function _displayNoChex()
 	{
