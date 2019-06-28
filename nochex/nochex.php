@@ -19,7 +19,7 @@ class nochex extends PaymentModule
 		$this->name = 'nochex';
 		$this->tab = 'payments_gateways';
 		$this->author = 'Nochex';
-		$this->version = '2.1';
+		$this->version = '2.1.1';
 
 		$this->currencies = true;
 		$this->currencies_mode = 'checkbox';		
