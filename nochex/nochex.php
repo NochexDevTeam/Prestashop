@@ -75,43 +75,42 @@ class nochex extends PaymentModule
 
 	private function _postValidation()
 	{
-		if (isset($_POST['btnSubmit']))
+		/*if (isset(Tools::getValue('btnSubmit')))
 		{
-			if (empty($_POST['email']))
+			if (empty(Tools::getValue('email'))
 				$this->_postErrors[] = $this->l('Account Email Id is required.');
-		}
+		}*/
 	}
 /*--- Once the update settings button has been pressed on the admin/config file, information is posted and updates the database/configuration details. ---*/
 	private function _postProcess()
 	{	
 	// Funtion and variable which writes to nochex_debug.txt
-	
-		
-		if (isset($_POST['btnSubmit']))
+	 
+		if (Tools::getValue('btnSubmit'))
 		{
 		
-			$nochex_merchantID = preg_replace('/[^A-Za-z0-9\-]@_$/', '',filter_var($_POST['email'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH));
+			$nochex_merchantID = preg_replace('/[^A-Za-z0-9\-]@_$/', '',filter_var(Tools::getValue('email'), FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH));
 			
 			if($nochex_merchantID != ""){
 			Configuration::updateValue('NOCHEX_APC_EMAIL', $nochex_merchantID);
-			Configuration::updateValue('NOCHEX_APC_TESTMODE', $_POST['test_mode']); /* value is checked or null, stores the state of the checkbox */
-			Configuration::updateValue('NOCHEX_APC_HIDEDETAILS', $_POST['hide_details']); /* value is checked or null, stores the state of the checkbox */
-			Configuration::updateValue('NOCHEX_APC_DEBUG', $_POST['nochex_debug']); /* value is checked or null, stores the state of the checkbox */
-			Configuration::updateValue('NOCHEX_APC_XMLCOLLECTION', $_POST['nochex_xmlcollection']); /* value is checked or null, stores the state of the checkbox */
-			Configuration::updateValue('NOCHEX_APC_POSTAGE', $_POST['nochex_postage']); /* value is checked or null, stores the state of the checkbox */			
-			Configuration::updateValue('NOCHEX_APC_CALLBACK',$_POST['nochex_callback']); /* value is checked or null, stores the state of the checkbox */	
+			Configuration::updateValue('NOCHEX_APC_TESTMODE', Tools::getValue('test_mode')); /* value is checked or null, stores the state of the checkbox */
+			Configuration::updateValue('NOCHEX_APC_HIDEDETAILS', Tools::getValue('hide_details')); /* value is checked or null, stores the state of the checkbox */
+			Configuration::updateValue('NOCHEX_APC_DEBUG', Tools::getValue('nochex_debug')); /* value is checked or null, stores the state of the checkbox */
+			Configuration::updateValue('NOCHEX_APC_XMLCOLLECTION', Tools::getValue('nochex_xmlcollection')); /* value is checked or null, stores the state of the checkbox */
+			Configuration::updateValue('NOCHEX_APC_POSTAGE', Tools::getValue('nochex_postage')); /* value is checked or null, stores the state of the checkbox */			
+			Configuration::updateValue('NOCHEX_APC_CALLBACK',Tools::getValue('nochex_callback')); /* value is checked or null, stores the state of the checkbox */	
 			}
 			// Refreshes the page to show updated controls. 
-			header('Location: ' . $_SERVER['HTTP_REFERER'] . '&ud=1');
-		}else if(isset($_REQUEST['ud']) == 1){
-		$this->_html .= '<div class="conf confirm" style="float: right;padding: 5px;background: lightgoldenrodyellow;font-weight: bold;"><img src="../img/admin/ok.gif" alt="'.$this->l('ok').'" /> '.$this->l('Nochex Module updated').'</div>';
+			//Tools::redirect($_SERVER['HTTP_REFERER'] . '&ud=1');
+			
+		}else if(Tools::getValue('ud') == 1){
+			$this->_html .= '<div class="conf confirm" style="float: right;padding: 5px;background: lightgoldenrodyellow;font-weight: bold;"><img src="../img/admin/ok.gif" alt="'.$this->l('ok').'" /> '.$this->l('Nochex Module updated').'</div>';
 		}
 	}
 	private function _displayNoChex()
 	{
-		$this->_html .= '<img src="https://www.nochex.com/logobase-secure-images/logobase-banners/clear-amex-mp.png" height="100px" style="float:left; margin-right:15px;"><br style="clear:both;"/><br style="clear:both;"/><b>'.$this->l('This module allows you to accept payments by Nochex (APC Method).').'</b><br /><br />
-		'.$this->l('If the client chooses this payment mode, the order will change its status once a positive confirmation is recieved from nochex server').'<br />
-		<br /><br />';
+		$this->_html .= '<img src="https://www.nochex.com/logobase-secure-images/logobase-banners/clear-mp.png" height="100px" style="float:left; margin-right:15px;"><br style="clear:both;"/><br style="clear:both;"/><b>'.$this->l('This module allows you to accept payments by Nochex (APC Method).').'</b><br /><br />
+		'.$this->l('If the client chooses this payment mode, the order will change its status once a positive confirmation is recieved from nochex server').'<br /><br /><br />';
 	}
 
 	/*---  Function returns the value to the form, which shows the state of the checkbox ---*/
@@ -154,7 +153,9 @@ class nochex extends PaymentModule
 	
 	$this->nochex_callback = $config['NOCHEX_APC_CALLBACK'];	
 	return $this->nochex_callback;	
-	}			 	
+	}		
+
+
 	/*--- Function, write to a text file ---*/
 	// Function that will be called when particular information needs to be written to a nochex_debug file.
 	public function writeDebug($DebugData){
@@ -185,10 +186,13 @@ class nochex extends PaymentModule
 			//If a problem or something doesn't work, then the catch will produce an email which will send an error message.
 			catch(Exception $e)
 			{
-			mail($this->email, "Debug Check Error Message", $e->getMessage());
+			/*mail($this->email, "Debug Check Error Message", $e->getMessage());*/
 			}
 		}
-	}/*---  Function shows the display form for the admin/config form. ---*/
+	}
+	
+	
+	/*---  Function shows the display form for the admin/config form. ---*/
 	private function _displayForm()
 	{
 			/*--- Calls the function to return the value of the checkbox ---*/
@@ -243,22 +247,29 @@ class nochex extends PaymentModule
 
 	public function hookPayment($params)
 	{
-		global $smarty,$cart, $currency;
+	
+	$cart = $params['cart'];
+	/*$currency = $params['currency'];*/
+	
+	/*$params*/
+	 
+		/*global $smarty,$cart, $currency;*/
 		
 		$defaultCurrency = Configuration::get('PS_CURRENCY_DEFAULT');
 		
 		//Convert Currency to Pounds
-		$currency = new Currency((int)$cart->id_currency);
-		$currencyGBP = new Currency((int)$defaultCurrency);		
+		$this->currency = new Currency((int)$cart->id_currency);
+		$this->currencyGBP = new Currency((int)$defaultCurrency);		
 		
-		$c_rate = (is_array($currency) ? $currency['conversion_rate'] : $currency->conversion_rate);
+		//print_r($params);
+		$c_rate = (is_array($this->currency) ? $this->currency['conversion_rate'] : $this->currency->conversion_rate);
 		
-		$customer = new Customer(intval($params['cart']->id_customer));
+		$customer = new Customer($params['cart']->id_customer);
 		
 		//--- get the delivery address
-		$del_add = new Address(intval($params['cart']->id_address_delivery));
+		$del_add = new Address($params['cart']->id_address_delivery);
         $del_add_fields = $del_add->getFields();
-
+ 
 		/*--- Gets the configuration details, which have been stored from the nochex module config form  ---*/
 		$apc_email = Configuration::get('NOCHEX_APC_EMAIL');
 		$test_mode = Configuration::get('NOCHEX_APC_TESTMODE');
@@ -270,15 +281,15 @@ class nochex extends PaymentModule
 		
 		if($nochex_postage == "checked"){
 		
-		$totalAmount = number_format(Tools::convertPriceFull($cart->getOrderTotal(true, 3),$currency , $currencyGBP), 2, '.', '');
-		$totalShipping = number_format(Tools::convertPriceFull($cart->getOrderTotal(true, Cart::ONLY_SHIPPING),$currency , $currencyGBP), 2, '.', '');
+		$totalAmount = number_format(Tools::convertPriceFull($cart->getOrderTotal(true, 3),$this->currency , $this->currencyGBP), 2, '.', '');
+		$totalShipping = number_format(Tools::convertPriceFull($cart->getOrderTotal(true, Cart::ONLY_SHIPPING),$this->currency , $this->currencyGBP), 2, '.', '');
 		
 		$totalAmount = number_format($totalAmount - $totalShipping, 2, '.', ''); 
 		
 		}else{
 		
 		$totalShipping = "";
-		$totalAmount =  number_format(Tools::convertPriceFull($cart->getOrderTotal(true, 3),$currency , $currencyGBP), 2, '.', '');
+		$totalAmount =  number_format(Tools::convertPriceFull($cart->getOrderTotal(true, 3),$this->currency , $this->currencyGBP), 2, '.', '');
 		
 		}
 		
@@ -293,12 +304,12 @@ class nochex extends PaymentModule
 		foreach($productDetails as $details_product)
 		{
 		
-		$item_collection .= "<item><id>". $details_product['id_product'] . "</id><name>" . $details_product['name'] . "</name><description>".$details_product['description_short']."</description><quantity>" . $details_product['quantity']  . "</quantity><price>" .  number_format(Tools::convertPriceFull($details_product['total_wt'],$currency , $currencyGBP), 2, '.', '')  . "</price></item>";
+		$item_collection .= "<item><id>". $details_product['id_product'] . "</id><name>" . $details_product['name'] . "</name><description>".$details_product['description_short']."</description><quantity>" . $details_product['quantity']  . "</quantity><price>" .  number_format(Tools::convertPriceFull($details_product['total_wt'],$this->currency , $this->currencyGBP), 2, '.', '')  . "</price></item>";
 		
 		}
 		$item_collection .= "</items>";
 		
-		$prodDet = "Order created for: " . intval($params['cart']->id);
+		$prodDet = "Order created for: " . $params['cart']->id;
 		}else{
 		
 		$item_collection = "";
@@ -311,7 +322,7 @@ class nochex extends PaymentModule
 		foreach($productDetails as $details_product)
 		{
 		
-		$prodDet .= "Product ID: ". $details_product['id_product'] . ", Product Name: " . $details_product['name'] . ", Quantity: " . $details_product['quantity']  . ", Amount: &#163 " .  number_format(Tools::convertPriceFull($details_product['total_wt'],$currency , $currencyGBP), 2, '.', '')  . ". ";
+		$prodDet .= "Product ID: ". $details_product['id_product'] . ", Product Name: " . $details_product['name'] . ", Quantity: " . $details_product['quantity']  . ", Amount: &#163 " .  number_format(Tools::convertPriceFull($details_product['total_wt'],$this->currency , $this->currencyGBP), 2, '.', '')  . ". ";
 		
 		}
 		$prodDet .= " ";
@@ -333,11 +344,11 @@ class nochex extends PaymentModule
 		} 
 		
 		// get the billing address and details
-		$bill_add = new Address(intval($params['cart']->id_address_invoice));
+		$bill_add = new Address($params['cart']->id_address_invoice);
         $bill_add_fields = $bill_add->getFields();
 	 		
 		//// Funtion and variable which writes to nochex_debug.txt
-		$submitOrder_Details = 'Order Details... Merchant_id: ' . $apc_email . '. amount: ' . number_format(round($totalAmount, 2), 2, '.', '') . '. order_id: ' . intval($params['cart']->id);
+		$submitOrder_Details = 'Order Details... Merchant_id: ' . $apc_email . '. amount: ' . number_format(round($totalAmount, 2), 2, '.', '') . '. order_id: ' . $params['cart']->id;
 		$this->writeDebug($submitOrder_Details);
 		//// Funtion and variable which writes to nochex_debug.txt
 		$submitOrder_Contents = 'Order Contents... Description: ' . $prodDet;
@@ -358,11 +369,12 @@ class nochex extends PaymentModule
 			$enabledCB = "No"; 
 		}
 		
-		/*---  Gets the variables which will be retrieved from the order process form, and the variables will be sent to Nochex.tpl, as the customer gets to the final stage of the order and about to press pay with Nochex.  number_format(round($amo, 2), 2, '.', '')---*/
-		 $smarty->assign(array(
+		/*---  Gets the variables which will be retrieved from the order process form, and the variables will be sent to Nochex.tpl, as the customer gets to the final stage of the order and about to press pay with Nochex.  number_format(round($amo, 2), 2, '.', '')---*
+		*/
+ $this->smarty->assign(array(
 			'merchant_id' => $apc_email,
 			'amount' => $totalAmount,
-			'order_id' => intval($params['cart']->id),
+			'order_id' => $params['cart']->id,
 			'description' => $prodDet,
 			'postage' => $totalShipping,
 			'xml_item_collection' => $item_collection,
@@ -388,7 +400,7 @@ class nochex extends PaymentModule
 		if($test_mode=="checked")
 		{
 		/*--- Attached variable which will send test information  ---*/
-		 $smarty->assign(array(
+		 $this->smarty->assign(array(
 				'teststatus' => true,
 				'test_transaction' => '100',
 				'test_success_url' => (Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://').htmlspecialchars($_SERVER['HTTP_HOST'], ENT_COMPAT, 'UTF-8').__PS_BASE_URI__.'modules/nochex/success.php?id_cart='.$cart->id.''));
@@ -401,13 +413,14 @@ class nochex extends PaymentModule
 		else
 		{
 		/*--- else test mode variable hasn't been checked then data will be sent to the form in live mode. ---*/
-		 $smarty->assign(array('teststatus' => false));
+		 $this->smarty->assign(array('teststatus' => false));
 		 
 		 // Funtion and variable which writes to nochex_debug.txt
 		 $test_mode_Info = 'test_status = false';
 		 $this->writeDebug($test_mode_Info);
 		}
-		return $this->display(__FILE__, 'nochex.tpl');
+		
+		return $this->display(__FILE__, '/views/nochex.tpl');
 	}
 
 }
