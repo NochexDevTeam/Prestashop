@@ -13,6 +13,10 @@ Visit our Knowledgebase for support: https://support.nochex.com/
 Changelog
 =====================
 
+= 2.1.1 =
+  
+  Update - Bug Fixes in relation to the module setup 
+    
 = 2.1 =
   
   Update - Bug fix for APC as orders were being duplicated.
