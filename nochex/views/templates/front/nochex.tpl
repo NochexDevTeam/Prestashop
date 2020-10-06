@@ -43,7 +43,7 @@ color: #777777;
 <p class="payment_module">
 	<a href="javascript:$('#nochex_form').submit();" title="{l s='Pay with Nochex APC' mod='nochex'}" style="padding: 0;width: 49%;" class="nochex">
 		
-		<img src="https://www.nochex.com/logobase-secure-images/logobase-banners/clear-amex-mp.png" style="height:100px;">
+		<img src="https://www.nochex.com/logobase-secure-images/logobase-banners/clear-mp.png" style="height:100px;">
 	
 	</a>
 </p>
