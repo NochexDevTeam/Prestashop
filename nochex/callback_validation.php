@@ -32,19 +32,17 @@ include(dirname(__FILE__).'/../../config/config.inc.php');
 include(dirname(__FILE__).'/nochex.php');
 /** Creates a new instance of the nochexDebug class */
 $nochexDebug = new nochex();
-$values = "";
-$customer = "";
+
 // VARIABLES
-foreach ($_POST as $key => $value) {
-    $values[] = $key."=".urlencode($value);
-}
-$work_string = @implode("&", $values);
-if (Tools::getValue("optional_2") == "Yes") {
-    $url = "https://secure.nochex.com/callback/callback.aspx";
+$postvars = http_build_query($_POST);
+
+if( isset($_POST["optional_2"]) == "Enabled") {
+
+	$url = "https://secure.nochex.com/callback/callback.aspx";
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $work_string);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $postvars);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
@@ -73,31 +71,29 @@ if (Tools::getValue("optional_2") == "Yes") {
         $responseAuthorisedMessage= "APC Response.... Order ID: " . Tools::getValue("order_id") . "... PS_OS_Payment: ". _PS_OS_PAYMENT_ . ". Amount: ". Tools::getValue("amount"). ". Display name: ". $nochex->displayName. ". CurrencyID: ". Tools::getValue("cIY");
         /** The variable with the APC response stored is sent to the new instance class with a function that writes to nochex_debug.txt */
         $nochexDebug->writeDebug($responseAuthorisedMessage);
-    } else if ($response == "DECLINED") {
+    } else {
         $nochex->validateOrder(Tools::getValue("order_id"), Configuration::get('PS_OS_ERROR'), Tools::getValue("amount"), $nochex->displayName, $responses, $extras, Tools::getValue("cIY"), $customer);
         /** The response from APC is stored in this variable. */
         $responseUnAuthorisedMessage= "APC Response.... Order ID: " . Tools::getValue("order_id") . "... PS_OS_Payment: ". _PS_OS_PAYMENT_ . "... Amount: ". Tools::getValue("amount"). "... Display name: ". $nochex->displayName. "... CurrencyID: ". Tools::getValue("cIY");
         /** The variable with the APC response stored is sent to the new instance class with a function that writes to nochex_debug.txt */
         $nochexDebug->writeDebug($responseUnAuthorisedMessage);
-    } else {
-        /** Error response if there is no response, APC is neither Autorised or Declined */
-        $subject = "NOCHEX VALIDITY RESPONSE: INVALID RESPONSE";
-        $msg = "RESPONSE FROM NOCHEX Was NEITHER AUTHORISED OR DECLINED?\n";
-        $msg.= "This could be because cURL isn't supported on your webserver.\n\n";
-        $msg.= "Response was \"{$response}\"\n\n";
-        $nochex->validateOrder(Tools::getValue("order_id"), Configuration::get('PS_OS_ERROR'), Tools::getValue("amount"), $nochex->displayName, $responses, $extras, $secure, $customer);
     }
+
+$order = new Order($nochex->currentOrder);
+Tools::redirect('index.php?controller=order-confirmation&id_cart='.Tools::getValue("order_id").'&id_module='.$nochex->id.'&id_order='.$nochex->currentOrder.'&key='.$customer);	
+
 } else {
+
     $url = "https://www.nochex.com/apcnet/apc.aspx";
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $work_string);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $postvars);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
     $output = curl_exec($ch);
-    curl_close($ch);
+    curl_close($ch); 
     $response = preg_replace("'Content-type: text/plain'si", "", $output);
     $responseMessage= "APC Response.... " . $response;
     $nochexDebug->writeDebug($responseMessage);
@@ -116,4 +112,8 @@ if (Tools::getValue("optional_2") == "Yes") {
         $responseUnAuthorisedMessage= "APC Response.... Order ID: " . Tools::getValue("order_id") . "... PS_OS_Payment: ". _PS_OS_PAYMENT_ . "... Amount: ". Tools::getValue("amount"). "... Display name: ". $nochex->displayName. "... CurrencyID: ". Tools::getValue("cIY");
         $nochexDebug->writeDebug($responseUnAuthorisedMessage);
     }
+		
+$order = new Order($nochex->currentOrder);
+Tools::redirect('index.php?controller=order-confirmation&id_cart='.Tools::getValue("order_id").'&id_module='.$nochex->id.'&id_order='.$nochex->currentOrder.'&key='.$custSecure);
+
 }
