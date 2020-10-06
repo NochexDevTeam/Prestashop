@@ -24,7 +24,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *  Plugin Name: Nochex Payment Gateway for Prestashop
 *  Description: Accept Nochex Payments, orders are updated using APC.
-*  Version: 2.0
+*  Version: 2.1.1
 *  License: GPL2
 */
 
@@ -205,7 +205,9 @@ class Nochex extends PaymentModule
     public function getContent()
     {
         $this->_html = '<h2>'.$this->displayName.'</h2>';
-        if (!empty($_POST)) {
+		
+		if (isset($_POST["tab"]) == "AdminModules"){
+        if (!empty($_POST["email"])) {
                 $this->_postValidation();
             if (!sizeof($this->_postErrors)) {
                 $this->_postProcess();
@@ -214,12 +216,14 @@ class Nochex extends PaymentModule
                     $this->_html .= '<div class="alert error">'. $err .'</div>';
                 }
             }
-        } else {
+        } /*else {*/
             $this->_html .= '<br />';
             $this->_displayNoChex();
             $this->_displayForm();
             return $this->_html;
-        }
+        /*}*/
+		}
+		
     }
 
     public function hookPayment($params)
@@ -259,7 +263,7 @@ class Nochex extends PaymentModule
             $productDetails = $cart->getProducts();
             $prodDet = "";
             foreach ($productDetails as $details_product) {
-                $prodDet .= "Product ID: ". $details_product['id_product'] . ", Product Name: " . $details_product['name'] . ", Quantity: " . $details_product['quantity']  . ", Amount: &#163 " . number_format(Tools::convertPriceFull($details_product['total_wt'], $this->currency, $this->currencyGBP), 2, '.', '') . ". ";
+                $prodDet .= "Product ID: ". $details_product['id_product'] . ", Product Name: " . $details_product['name'] . ", Quantity: " . $details_product['quantity']  . ", Amount: " . number_format(Tools::convertPriceFull($details_product['total_wt'], $this->currency, $this->currencyGBP), 2, '.', '') . " GBP. ";
             }
             $prodDet .= " ";
         }
@@ -280,13 +284,18 @@ class Nochex extends PaymentModule
         $this->writeDebug($submitorder_Billing);
         $submitorder_Delivery = 'Delivery Details... delivery_fullname: ' . $del_add_fields['firstname'] . ', ' . $del_add_fields['lastname'] . '. delivery_address: ' . $del_add_fields['address1'] . '. delivery_postcode: ' . $del_add_fields['postcode'];
         $this->writeDebug($submitorder_Delivery);
-        $submitorder_Contact = 'Contact Information... customer_phone_number: ' . $bill_add_fields['phone_mobile'] . '. email_address: ' . $customer->email;
+		
+		        
+		if($bill_add_fields['phone_mobile'] == "") {
+		$contact_number = $bill_add_fields['phone'];
+		} else {
+		$contact_number = $bill_add_fields['phone_mobile'];
+		}
+		
+        $submitorder_Contact = 'Contact Information... customer_phone_number: ' . $contact . '. email_address: ' . $customer->email;
         $this->writeDebug($submitorder_Contact);
-        if ($nochex_callback == "checked") {
-            $enabledCB = "Yes";
-        } else {
-            $enabledCB = "No";
-        }
+
+		
         $this->smarty->assign(array(
         'merchant_id' => $apc_email,
         'amount' => $totalAmount,
@@ -302,13 +311,14 @@ class Nochex extends PaymentModule
         'delivery_address' => $del_add_fields['address1'],
         'delivery_city' => $del_add_fields['city'],
         'delivery_postcode' => $del_add_fields['postcode'],
-        'customer_phone_number' => $bill_add_fields['phone_mobile'],
+        'customer_phone_number' => $contact_number,
         'hide_billing_details' => $hideBilling,
         'optional_1' => $params['cart']->secure_key,
         'email_address' => $customer->email,
         'responderurl' => (Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://').htmlspecialchars($_SERVER['HTTP_HOST'], ENT_COMPAT, 'UTF-8').__PS_BASE_URI__.'modules/nochex/callback_validation.php?cIY='.(int)$defaultCurrency,
         'cancelurl' => (Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://').htmlspecialchars($_SERVER['HTTP_HOST'], ENT_COMPAT, 'UTF-8').__PS_BASE_URI__.'order.php',
-        'successurl' => (Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://').htmlspecialchars($_SERVER['HTTP_HOST'], ENT_COMPAT, 'UTF-8').__PS_BASE_URI__.'modules/nochex/success.php?id_cart='.$cart->id.'','optional_2' => $enabledCB,
+        'successurl' => (Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://').htmlspecialchars($_SERVER['HTTP_HOST'], ENT_COMPAT, 'UTF-8').__PS_BASE_URI__.'modules/nochex/success.php?id_cart='.$cart->id.'',
+        'optional_2' => "Enabled",
         'this_path' => $this->_path,
         'this_path_ssl' => (Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://').htmlspecialchars($_SERVER['HTTP_HOST'], ENT_COMPAT, 'UTF-8').__PS_BASE_URI__.'modules/'.$this->name.'/'
         ));
