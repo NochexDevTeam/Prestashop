@@ -13,6 +13,14 @@ Visit our Knowledgebase for support: https://support.nochex.com/
 Changelog
 =====================
 
+= 2.1.2 =
+
+  Update - bug fixes in relation to latest version of Prestashop 1.6.x
+  
+    - Configuration / module settings not showing - php issue
+    - Callback / APC - orders not updating
+    - Success page - confirmation not showing as expected
+
 = 2.1.1 =
   
   Update - Bug Fixes in relation to the module setup 
