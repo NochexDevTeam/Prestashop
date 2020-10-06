@@ -6,7 +6,8 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *  Plugin Name: Nochex Payment Gateway for Prestashop
 *  Description: Accept Nochex Payments, orders are updated using APC.
-*  Version: 2.0*  License: GPL2
+*  Version: 2.1.1
+*  License: GPL2
 */
 
 include(dirname(__FILE__).'/../../config/config.inc.php');
@@ -17,6 +18,12 @@ $controller = new FrontController();
 $controller->init();
 $id_cart = Tools::getValue("id_cart");
 $myid_order = Order::getOrderByCartId($id_cart);
-$nochexDebug->smarty->assign('nochexorder', $myid_order);
-$nochexDebug->smarty->display(_PS_MODULE_DIR_.'nochex/views/templates/front/payment_return.tpl');
+
+$order = new Order((int) $myid_order);
+$id_customer = $order->id_customer;
+$customer = new Customer((int)$id_customer);
+                
+$smarty->assign('nochexorder', $myid_order);
+$smarty->display(_PS_MODULE_DIR_.'nochex/views/templates/front/payment_return.tpl');
+		
 include(dirname(__FILE__).'/../../footer.php');
