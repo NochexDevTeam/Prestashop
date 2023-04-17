@@ -13,6 +13,10 @@ Visit our Knowledgebase for support: https://support.nochex.com/
 Changelog
 =====================
 
+= 2.1.3 =
+
+  Small change to APC page
+
 = 2.1.2 =
 
   Update - bug fixes in relation to latest version of Prestashop 1.6.x
